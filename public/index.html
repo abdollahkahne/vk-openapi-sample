@@ -1,0 +1,101 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <title>Document</title>
+
+    
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="#">Navbar</a>
+      
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+          <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/sensitive">SensitiveInfo</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/profile">User</a>
+            </li>
+          </ul>
+          
+          <button id="vk_login" class="btn btn-outline-primary my-2 my-sm-0" type="button">VK Login</button>
+          <button id="vk_logout" class="btn btn-outline-secondary my-2 my-sm-0" style="display: none;" type="button">VK Logout</button>
+        </div>
+      </nav>
+      <h2>Home Page</h2>
+      <p>This info are public and anynomous user can see them easily</p>
+      <strong>But sensitive information placed <a href="/sensitive">here</a>  and needs user login</strong>
+      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Fuga necessitatibus suscipit minus beatae molestiae mollitia maxime quae iusto hic deserunt. Quo eligendi minus enim a tenetur illo quasi dicta placeat.</p>
+
+      <script src="//vk.com/js/api/openapi.js" type="text/javascript"></script>
+
+      <script type="text/javascript">
+        VK.init({
+          apiId: 7852910
+        });
+      </script>
+
+      <script type="text/javascript">
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+      }
+
+      $(function() {
+        $("#vk_logout").on("click",()=>{
+          VK.Auth.logout(function(response) {
+            fetch("/auth/signout")
+            .then((result)=>result.json())
+            .then(res=>{
+              if (res.success) {
+                $("#vk_login").css({display:"block"});
+                $("#vk_logout").css({display:"none"});
+              }
+            });
+          });
+        });
+        $("#vk_login").on("click",()=>{
+          VK.Auth.login(function(response) {
+            const {session:{expire,mid,secret,sid,sig}}=response;
+            if (sig) {
+              fetch(`/auth/vk`, {
+                credentials: "include",
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({ data:{expire,mid,secret,sid,sig }}),
+              }).then(result=>result.json())
+              .then(res=>{
+                if (res.success) {
+                  $("#vk_login").css({display:"none"});
+                  $("#vk_logout").css({display:"block"});
+                  console.log(res.user);
+                }
+              });
+            }
+          });
+        });
+        if (getCookie("vkAuth")=="vk") {
+          $("#vk_login").css({display:"none"});
+          $("#vk_logout").css({display:"block"});
+        }
+        
+      });
+    
+    </script>
+
+</body>
+</html>

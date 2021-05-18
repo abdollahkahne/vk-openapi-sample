@@ -1,0 +1,24 @@
+{
+  "name": "sample-openapi",
+  "version": "1.0.0",
+  "description": "This is a sample that uses vk-auth-lirary for Authnetication and Authroization using VK",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "oAuth",
+    "sample",
+    "vk-auth-library"
+  ],
+  "author": "Abdollah Kahne",
+  "license": "ISC",
+  "dependencies": {
+    "cookie-parser": "^1.4.5",
+    "dotenv": "^9.0.2",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "vk-auth-library": "^1.0.2"
+  }
+}
